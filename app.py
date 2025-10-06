@@ -39,7 +39,7 @@ def login():
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 # Configuration
-ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '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')
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
 UPLOAD_FOLDER = 'uploads'
 REPORT_FOLDER = 'reports'
 DATABASE = 'property_reports.db'
