@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Search Report Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .file-upload:hover {
+            border-color: #4299e1;
+            background-color: #ebf8ff;
+        }
+        .file-upload.dragover {
+            border-color: #3182ce;
+            background-color: #bee3f8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">🏠 Property Search Report Generator</h1>
+                <p class="text-gray-600">Upload 3 search reports to generate professional summaries</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-6 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="bg-white rounded-lg shadow-xl p-8">
+                <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Property Address *
+                        </label>
+                        <input 
+                            type="text" 
+                            name="property_address" 
+                            required
+                            placeholder="e.g., Flat 2, Red Lodge Apartments, 61 Clarence Parade, Southsea, PO5 2HP"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                📄 Local Authority Search *
+                            </label>
+                            <div class="file-upload">
+                                <input 
+                                    type="file" 
+                                    name="local_authority" 
+                                    required
+                                    accept=".pdf"
+                                    class="hidden"
+                                    id="local_authority"
+                                    onchange="updateFileName(this, 'local_label')"
+                                />
+                                <label for="local_authority" class="cursor-pointer">
+                                    <div class="text-gray-600">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-2" id="local_label">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-gray-500">PDF files only</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                🌍 Environmental Report *
+                            </label>
+                            <div class="file-upload">
+                                <input 
+                                    type="file" 
+                                    name="environmental" 
+                                    required
+                                    accept=".pdf"
+                                    class="hidden"
+                                    id="environmental"
+                                    onchange="updateFileName(this, 'env_label')"
+                                />
+                                <label for="environmental" class="cursor-pointer">
+                                    <div class="text-gray-600">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-2" id="env_label">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-gray-500">PDF files only</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                💧 Drainage & Water Report *
+                            </label>
+                            <div class="file-upload">
+                                <input 
+                                    type="file" 
+                                    name="drainage" 
+                                    required
+                                    accept=".pdf"
+                                    class="hidden"
+                                    id="drainage"
+                                    onchange="updateFileName(this, 'drainage_label')"
+                                />
+                                <label for="drainage" class="cursor-pointer">
+                                    <div class="text-gray-600">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-2" id="drainage_label">Click to upload or drag and drop</p>
+                                        <p class="text-xs text-gray-500">PDF files only</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 transform hover:scale-105"
+                    >
+                        🚀 Generate Reports
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <a href="{{ url_for('history') }}" class="text-blue-600 hover:text-blue-800 text-sm">
+                        View Report History →
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 class="font-semibold text-blue-900 mb-2">ℹ️ How it works</h3>
+                <ol class="list-decimal list-inside space-y-1 text-sm text-blue-800">
+                    <li>Enter the property address</li>
+                    <li>Upload all 3 search report PDFs</li>
+                    <li>Click "Generate Reports"</li>
+                    <li>Download both INTERNAL and CLIENT versions</li>
+                </ol>
+                <p class="mt-4 text-xs text-blue-700">
+                    Processing takes 30-60 seconds per property. Reports are saved to history for future reference.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateFileName(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files[0]) {
+                label.textContent = '✓ ' + input.files[0].name;
+                input.parentElement.parentElement.style.borderColor = '#48bb78';
+                input.parentElement.parentElement.style.backgroundColor = '#f0fff4';
+            }
+        }
+
+        document.querySelectorAll('.file-upload').forEach(element => {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                element.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                element.addEventListener(eventName, () => {
+                    element.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                element.addEventListener(eventName, () => {
+                    element.classList.remove('dragover');
+                });
+            });
+
+            element.addEventListener('drop', handleDrop, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            const input = this.querySelector('input[type="file"]');
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                input.files = files;
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+            button.disabled = true;
+        });
+    </script>
+</body>
+</html>

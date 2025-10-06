@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report History - Property Search Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Report History</h1>
+                    <p class="text-gray-600 mt-1">Previously generated property reports</p>
+                </div>
+                <a href="{{ url_for('index') }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+                    + New Report
+                </a>
+            </div>
+
+            {% if reports %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signals</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Generated</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for report in reports %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-900">{{ report[1] }}</div>
+                                <div class="text-xs text-gray-500">ID: #{{ report[0] }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex gap-2">
+                                    {% if report[5] > 0 %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                        {{ report[5] }} Red
+                                    </span>
+                                    {% endif %}
+                                    {% if report[6] > 0 %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                        {{ report[6] }} Amber
+                                    </span>
+                                    {% endif %}
+                                    {% if report[7] > 0 %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
+                                        {{ report[7] }} Green
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                {{ report[2] }}
+                            </td>
+                            <td class="px-6 py-4 text-right text-sm font-medium">
+                                <div class="flex gap-2 justify-end">
+                                    <a href="{{ url_for('download', report_id=report[0], report_type='internal') }}" 
+                                       class="text-gray-600 hover:text-gray-900 px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">
+                                        Internal
+                                    </a>
+                                    <a href="{{ url_for('download', report_id=report[0], report_type='client') }}" 
+                                       class="text-blue-600 hover:text-blue-900 px-3 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                        Client
+                                    </a>
+                                    <a href="{{ url_for('results', report_id=report[0]) }}" 
+                                       class="text-green-600 hover:text-green-900">
+                                        View →
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No reports yet</h3>
+                <p class="text-gray-600 mb-6">Get started by generating your first property search report</p>
+                <a href="{{ url_for('index') }}" 
+                   class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+                    Generate First Report
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
